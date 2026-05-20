@@ -1,11 +1,13 @@
 import "./globals.css";
+import ScrollProvider from "./ScrollProvider";
+import FloatingButtons from "./components/FloatingButtons";
 
 export const metadata = {
-  title: "Jan Saathi — Find Every Government Benefit You Deserve",
+  title: "Unnati — Find Every Government Benefit You Deserve",
   description: "AI-powered welfare navigator for Indian citizens. Find government schemes you qualify for, get step-by-step application guides, and claim your benefits — in your language.",
   keywords: "government schemes, welfare, PM-KISAN, Ayushman Bharat, MGNREGA, India, benefits",
   openGraph: {
-    title: "Jan Saathi — Your Personal Welfare Navigator",
+    title: "Unnati — Your Personal Welfare Navigator",
     description: "Find every government benefit you deserve — in minutes",
     type: "website",
   },
@@ -51,9 +53,12 @@ export default function RootLayout({ children }) {
             <feBlend in="SourceGraphic" in2="noise" mode="multiply" />
           </filter>
         </svg>
-        <div className="relative z-10">
-          {children}
-        </div>
+          <div className="relative z-10">
+            {/* Client-side scroll/animation provider */}
+            <ScrollProvider />
+            {children}
+            <FloatingButtons />
+          </div>
       </body>
     </html>
   );

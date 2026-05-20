@@ -65,12 +65,12 @@ export default function LandingPage() {
         <Header />
       
       {/* HERO SECTION */}
-      <section className="hero-gradient relative overflow-hidden" style={{ paddingTop: 'calc(var(--header-height) + 40px)', paddingBottom: 80 }}>
+      <section data-anim="fade-up" className="hero-gradient relative overflow-hidden section-lg" style={{ paddingTop: 'calc(var(--header-height) + 40px)' }}>
         {/* Decorative elements */}
         <div className="absolute top-20 left-10 w-72 h-72 rounded-full opacity-20 animate-float" style={{ background: 'radial-gradient(circle, var(--primary-300), transparent)', filter: 'blur(40px)' }} />
         <div className="absolute bottom-10 right-10 w-96 h-96 rounded-full opacity-15 animate-float" style={{ background: 'radial-gradient(circle, var(--accent-300), transparent)', filter: 'blur(60px)', animationDelay: '1.5s' }} />
         
-        <div className="relative z-10 px-4 text-center" style={{ maxWidth: 720, margin: '0 auto' }}>
+        <div className="relative z-10 px-4 text-center container" style={{ maxWidth: 720 }}>
           {/* Trust badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 animate-fade-in-down glass" style={{ borderRadius: 9999, borderColor: 'rgba(164, 244, 253, 0.16)', boxShadow: '0 8px 24px rgba(0, 0, 0, 0.18)' }}>
             <Shield size={14} style={{ color: 'var(--success-500)' }} />
@@ -119,8 +119,8 @@ export default function LandingPage() {
       </section>
 
       {/* STATS BAR */}
-      <section className="py-8" style={{ background: 'rgba(7, 10, 17, 0.88)', borderTop: '1px solid rgba(255,255,255,0.08)', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 px-4" style={{ maxWidth: 'var(--max-width)', margin: '0 auto' }}>
+      <section data-anim="fade-up" className="section-tight" style={{ background: 'rgba(7, 10, 17, 0.88)', borderTop: '1px solid rgba(255,255,255,0.08)', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 px-4 container">
           {stats.map((stat, i) => (
             <div key={i} className="text-center">
               <div className="text-2xl sm:text-3xl font-bold text-white mb-1">
@@ -133,7 +133,7 @@ export default function LandingPage() {
       </section>
 
       {/* HOW IT WORKS */}
-      <section className="py-16 lg:py-24 px-4" style={{ maxWidth: 'var(--max-width)', margin: '0 auto' }}>
+      <section data-anim="fade-up" className="section-lg px-4 container">
         <h2 className="text-3xl sm:text-4xl font-semibold text-center mb-4" style={{ color: 'white', letterSpacing: '-0.03em' }}>
           {t(language, 'howItWorks')}
         </h2>
@@ -141,7 +141,7 @@ export default function LandingPage() {
           Three simple steps to discover your government benefits
         </p>
         
-        <div className="grid md:grid-cols-3 gap-8">
+        <div data-anim="stagger" className="grid md:grid-cols-3 gap-8">
           {steps.map((step, i) => (
             <div key={i} className="card p-8 text-center relative overflow-hidden group">
               {/* Step number */}
@@ -160,8 +160,8 @@ export default function LandingPage() {
       </section>
 
       {/* SCHEME CATEGORIES */}
-      <section className="py-16 px-4" style={{ background: 'linear-gradient(180deg, rgba(12,12,12,0.75), rgba(12,12,12,0.92))', borderTop: '1px solid rgba(255,255,255,0.06)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-        <div style={{ maxWidth: 'var(--max-width)', margin: '0 auto' }}>
+      <section data-anim="fade-up" className="section px-4" style={{ background: 'linear-gradient(180deg, rgba(12,12,12,0.75), rgba(12,12,12,0.92))', borderTop: '1px solid rgba(255,255,255,0.06)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="container">
           <h2 className="text-3xl font-semibold text-center mb-2" style={{ color: 'white', letterSpacing: '-0.03em' }}>Covering Every Area of Your Life</h2>
           <p className="text-center mb-10" style={{ color: 'rgba(255,255,255,0.56)' }}>From farming to education, health to housing</p>
           
@@ -180,11 +180,11 @@ export default function LandingPage() {
       </section>
 
       {/* TESTIMONIALS */}
-      <section className="py-16 px-4" style={{ maxWidth: 'var(--max-width)', margin: '0 auto' }}>
+      <section data-anim="fade-up" className="section px-4 container">
         <h2 className="text-3xl font-semibold text-center mb-10" style={{ color: 'white', letterSpacing: '-0.03em' }}>Real Stories from Real People</h2>
         <div className="grid md:grid-cols-3 gap-6">
           {[
-            { name: "Ramesh Kumar", loc: "Varanasi, UP", text: "I didn't know I was eligible for PM-KISAN. Jan Saathi found it and 4 other schemes for me. I'm now getting ₹6,000 per year directly!", avatar: "RK" },
+            { name: "Ramesh Kumar", loc: "Varanasi, UP", text: "I didn't know I was eligible for PM-KISAN. Unnati found it and 4 other schemes for me. I'm now getting ₹6,000 per year directly!", avatar: "RK" },
             { name: "Sunita Devi", loc: "Yavatmal, Maharashtra", text: "As a widow with two children, I discovered 7 schemes I never knew about. The step-by-step guide made it so easy to apply.", avatar: "SD" },
             { name: "Murugan S.", loc: "Thanjavur, Tamil Nadu", text: "My father got his Ayushman Bharat card within a week after following the steps here. Saved us ₹2 lakh on his surgery!", avatar: "MS" },
           ].map((t, i) => (
@@ -206,8 +206,7 @@ export default function LandingPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 px-4" style={{ background: 'linear-gradient(180deg, rgba(12,12,12,0.92), rgba(7,10,17,0.96))', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-        <div style={{ maxWidth: 700, margin: '0 auto' }}>
+      <section data-anim="fade-up" className="section px-4 container" style={{ background: 'linear-gradient(180deg, rgba(12,12,12,0.92), rgba(7,10,17,0.96))', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
           <h2 className="text-3xl font-semibold text-center mb-10" style={{ color: 'white', letterSpacing: '-0.03em' }}>Frequently Asked Questions</h2>
           <div className="flex flex-col gap-3">
             {faqs.map((faq, i) => (
@@ -222,11 +221,10 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
-        </div>
       </section>
 
       {/* FINAL CTA */}
-      <section className="py-20 px-4 text-center" style={{ background: 'linear-gradient(135deg, var(--primary-600), var(--accent-600))' }}>
+      <section data-anim="fade-up" className="section-lg px-4 text-center" style={{ background: 'linear-gradient(135deg, var(--primary-600), var(--accent-600))' }}>
         <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Ready to find your benefits?</h2>
         <p className="text-lg mb-8" style={{ color: 'rgba(255,255,255,0.85)' }}>It takes just 5 minutes. No signup needed.</p>
         <Link href="/onboarding" className="btn btn-lg" style={{ background: 'rgba(255,255,255,0.78)', color: 'var(--primary-700)', padding: '18px 40px', fontSize: 18, borderRadius: 16 }}>
@@ -236,22 +234,30 @@ export default function LandingPage() {
       </section>
 
       {/* FOOTER */}
-      <footer className="py-10 px-4" style={{ background: 'var(--neutral-900)' }}>
-        <div className="text-center">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, var(--primary-500), var(--accent-500))' }}>
-              <span className="text-white font-bold text-sm">जन</span>
+      <footer className="site-footer">
+        <div className="footer-inner container">
+          <div className="footer-column footer-brand">
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, var(--primary-500), var(--accent-500))' }}>
+              <span className="text-white font-bold text-sm">उन्नति</span>
             </div>
-            <span className="font-bold text-white">Jan Saathi</span>
+            <div>
+              <div className="font-bold text-white">Unnati</div>
+              <div className="text-sm" style={{ color: 'var(--neutral-400)' }}>{t(language, 'privacyDesc')}</div>
+            </div>
           </div>
-          <p className="text-sm mb-6" style={{ color: 'var(--neutral-400)' }}>{t(language, 'privacyDesc')}</p>
-          <div className="flex justify-center gap-6 text-xs" style={{ color: 'var(--neutral-500)' }}>
-            <span>{t(language, 'footerPrivacy')}</span>
-            <span>{t(language, 'footerTerms')}</span>
-            <span>{t(language, 'footerContact')}</span>
+
+          <div className="footer-column footer-links">
+            <a href="#">{t(language, 'footerPrivacy')}</a>
+            <a href="#">{t(language, 'footerTerms')}</a>
+            <a href="#">{t(language, 'footerContact')}</a>
           </div>
-          <p className="mt-6 text-xs" style={{ color: 'var(--neutral-600)' }}>{t(language, 'footerMadeWith')}</p>
+
+          <div className="footer-column" style={{ textAlign: 'right' }}>
+            <div style={{ color: 'var(--neutral-500)' }}>{t(language, 'footerMadeWith')}</div>
+            <div style={{ marginTop: 8, color: 'var(--neutral-500)' }}>© {new Date().getFullYear()} Unnati</div>
+          </div>
         </div>
+        <div className="footer-bottom">Built with care • Data is private • Version 0.1</div>
       </footer>
       </div>
     </div>

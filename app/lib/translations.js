@@ -1,7 +1,7 @@
 const translations = {
   en: {
     // Common
-    appName: "Jan Saathi",
+    appName: "Unnati",
     tagline: "Your Personal Welfare Navigator",
     loading: "Loading...",
     save: "Save",
@@ -248,7 +248,7 @@ const translations = {
   },
   
   hi: {
-    appName: "जन साथी",
+    appName: "उन्नति",
     tagline: "आपका निजी कल्याण मार्गदर्शक",
     loading: "लोड हो रहा है...",
     save: "सहेजें",

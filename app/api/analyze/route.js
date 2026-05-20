@@ -14,7 +14,7 @@ export async function POST(request) {
 
     const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
-    const systemPrompt = `You are Jan Saathi, an expert AI assistant helping Indian citizens find government welfare schemes they are eligible for.
+    const systemPrompt = `You are Unnati, an expert AI assistant helping Indian citizens find government welfare schemes they are eligible for.
 
 Given a citizen's profile, analyze their eligibility and return ONLY a valid JSON object (no markdown, no code blocks, no extra text) with this exact structure:
 {

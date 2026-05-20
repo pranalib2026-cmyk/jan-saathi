@@ -37,10 +37,10 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 no-underline justify-self-start">
             <div className="flex items-center justify-center rounded-xl" style={{ width: 30, height: 30, background: 'linear-gradient(135deg, var(--primary-500), var(--accent-500))', boxShadow: '0 10px 24px rgba(61,129,227,0.25)' }}>
-              <span className="text-white font-bold text-sm">जन</span>
+              <span className="text-white font-bold text-sm">उन्नति</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="font-semibold tracking-tight" style={{ fontSize: 15, color: 'white' }}>Jan Saathi</span>
+              <span className="font-semibold tracking-tight" style={{ fontSize: 15, color: 'white' }}>Unnati</span>
               <span className="hidden lg:inline text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>{t(language, 'tagline')}</span>
             </div>
           </Link>
