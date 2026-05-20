@@ -16,7 +16,7 @@ export async function POST(request) {
     }
 
     const OPENROUTER_URLS = [
-      process.env.OPENROUTER_URL || "https://openrouter.ai/api/v1/chat/completions",
+      process.env.OPENROUTER_URL || "https://openrouter.ai/v1/chat/completions",
       "https://api.openrouter.ai/v1/chat/completions",
     ];
 
@@ -109,6 +109,41 @@ PM-KISAN, Ayushman Bharat, PM Awas Yojana, MGNREGA, Ujjwala Yojana, Jan Dhan, PM
     if (!response) {
       console.error("All OpenRouter endpoints failed:", lastErr);
       const errMsg = lastErr && lastErr.message ? lastErr.message : String(lastErr || 'unknown error');
+      // Try OpenAI as a final fallback if configured
+      const openAiKey = process.env.OPENAI_API_KEY || process.env.OPENAI_KEY;
+      if (openAiKey) {
+        try {
+          const oaController = new AbortController();
+          const oaTimer = setTimeout(() => oaController.abort(), 15000);
+          try {
+            const oaResp = await fetch('https://api.openai.com/v1/chat/completions', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${openAiKey}`,
+              },
+              body: JSON.stringify({ model: 'gpt-3.5-turbo', messages: chatMessages, temperature: 0.2, max_tokens: 1024 }),
+              signal: oaController.signal,
+            });
+            clearTimeout(oaTimer);
+            if (oaResp && oaResp.ok) {
+              const oaData = await oaResp.json();
+              const oaChoice = oaData?.choices?.[0];
+              let oaText = 'Sorry, could not generate response.';
+              if (oaChoice) {
+                if (oaChoice.message && oaChoice.message.content) oaText = oaChoice.message.content;
+                else if (oaChoice.text) oaText = oaChoice.text;
+              }
+              return NextResponse.json({ message: oaText, source: 'openai' });
+            }
+          } finally {
+            try { clearTimeout(oaTimer); } catch (e) {}
+          }
+        } catch (e) {
+          console.warn('OpenAI fallback failed:', e?.message || e);
+        }
+      }
+
       return NextResponse.json({
         message:
           `AI service unreachable (${errMsg}). Please check your network, DNS, or OPENROUTER_URL / OPENROUTER_API_KEY settings.`,
