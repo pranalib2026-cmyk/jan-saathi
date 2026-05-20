@@ -2,7 +2,22 @@ import { NextResponse } from "next/server";
 
 export async function POST(request) {
   try {
-    const { messages, profile } = await request.json();
+    let messages = null;
+    let profile = null;
+    try {
+      const parsed = await request.json();
+      messages = parsed.messages;
+      profile = parsed.profile;
+    } catch (reqErr) {
+      // Log raw body to help debugging
+      try {
+        const raw = await request.text();
+        console.error('Failed to parse JSON request body for /api/chat. Raw body:', raw);
+      } catch (r) {
+        console.error('Failed to read raw request body after JSON parse error.', r);
+      }
+      throw reqErr;
+    }
 
     // Read API key at request time (not module load time)
     const apiKey = process.env.OPENROUTER_API_KEY || process.env.GEMINI_API_KEY;
