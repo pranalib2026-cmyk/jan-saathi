@@ -4,18 +4,14 @@ export async function POST(request) {
   try {
     let messages = null;
     let profile = null;
+    // Read raw body first so we can log it if JSON parsing fails.
+    const rawBody = await request.text();
     try {
-      const parsed = await request.json();
+      const parsed = rawBody ? JSON.parse(rawBody) : {};
       messages = parsed.messages;
       profile = parsed.profile;
     } catch (reqErr) {
-      // Log raw body to help debugging
-      try {
-        const raw = await request.text();
-        console.error('Failed to parse JSON request body for /api/chat. Raw body:', raw);
-      } catch (r) {
-        console.error('Failed to read raw request body after JSON parse error.', r);
-      }
+      console.error('Failed to parse JSON request body for /api/chat. Raw body:', rawBody);
       throw reqErr;
     }
 
