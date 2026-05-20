@@ -26,11 +26,20 @@ export async function POST(request) {
       });
     }
 
-    // Prefer the official API host first. Allow overriding with OPENROUTER_URL.
-    const OPENROUTER_URLS = [
-      process.env.OPENROUTER_URL || "https://api.openrouter.ai/v1/chat/completions",
-      "https://openrouter.ai/v1/chat/completions",
-    ];
+    // Construct candidate OpenRouter URLs. If OPENROUTER_URL is set but points
+    // to the marketing site (openrouter.ai) it will be ignored with a warning
+    // because that host serves HTML (404) rather than the API.
+    const OPENROUTER_URLS = [];
+    const envUrl = process.env.OPENROUTER_URL;
+    if (envUrl) {
+      if (envUrl.includes('openrouter.ai') && !envUrl.includes('api.')) {
+        console.warn('OPENROUTER_URL appears to point to openrouter.ai (website) rather than the API. Ignoring it. Set OPENROUTER_URL to https://api.openrouter.ai/v1/chat/completions if you intended to override.');
+      } else {
+        OPENROUTER_URLS.push(envUrl);
+      }
+    }
+    OPENROUTER_URLS.push('https://api.openrouter.ai/v1/chat/completions');
+    OPENROUTER_URLS.push('https://openrouter.ai/v1/chat/completions');
 
     const systemPrompt = `You are Unnati (उन्नति), a friendly and knowledgeable AI assistant helping Indian citizens navigate government welfare schemes.
 
