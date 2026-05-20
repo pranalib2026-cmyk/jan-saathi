@@ -61,10 +61,10 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen" style={{ background: '#fafafa' }}>
-      <Header />
+      <Header showAnnouncement />
       
       {/* HERO SECTION */}
-      <section className="hero-gradient relative overflow-hidden" style={{ paddingTop: 'calc(var(--header-height) + 40px)', paddingBottom: 80 }}>
+      <section className="hero-gradient relative overflow-hidden py-16" style={{ paddingTop: 'calc(var(--header-height) + var(--announcement-height) + 40px)' }}>
         {/* Decorative elements */}
         <div className="absolute top-20 left-10 w-72 h-72 rounded-full opacity-20 animate-float" style={{ background: 'radial-gradient(circle, var(--primary-300), transparent)', filter: 'blur(40px)' }} />
         <div className="absolute bottom-10 right-10 w-96 h-96 rounded-full opacity-15 animate-float" style={{ background: 'radial-gradient(circle, var(--accent-300), transparent)', filter: 'blur(60px)', animationDelay: '1.5s' }} />
@@ -117,8 +117,8 @@ export default function LandingPage() {
       </section>
 
       {/* STATS BAR */}
-      <section className="py-8" style={{ background: 'var(--neutral-900)' }}>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 px-4" style={{ maxWidth: 'var(--max-width)', margin: '0 auto' }}>
+      <section className="py-12" style={{ background: 'var(--neutral-900)' }}>
+        <div className="max-w-6xl mx-auto px-4 grid grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, i) => (
             <div key={i} className="text-center">
               <div className="text-2xl sm:text-3xl font-bold text-white mb-1">
@@ -131,43 +131,45 @@ export default function LandingPage() {
       </section>
 
       {/* HOW IT WORKS */}
-      <section className="py-16 lg:py-24 px-4" style={{ maxWidth: 'var(--max-width)', margin: '0 auto' }}>
-        <h2 className="text-3xl sm:text-4xl font-bold text-center mb-4" style={{ color: 'var(--neutral-900)' }}>
-          {t(language, 'howItWorks')}
-        </h2>
-        <p className="text-center mb-12" style={{ color: 'var(--neutral-500)', maxWidth: 500, margin: '0 auto' }}>
-          Three simple steps to discover your government benefits
-        </p>
-        
-        <div className="grid md:grid-cols-3 gap-8">
-          {steps.map((step, i) => (
-            <div key={i} className="card p-8 text-center relative overflow-hidden group">
-              {/* Step number */}
-              <div className="absolute top-4 right-4 text-6xl font-black" style={{ color: 'var(--neutral-100)', lineHeight: 1 }}>{i + 1}</div>
-              
-              <div className="relative z-10">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-6 transition-transform group-hover:scale-110" style={{ background: `${step.color}15` }}>
-                  <step.icon size={28} style={{ color: step.color }} />
+      <section className="py-16">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-center mb-4" style={{ color: 'var(--neutral-900)' }}>
+            {t(language, 'howItWorks')}
+          </h2>
+          <p className="text-center mb-12" style={{ color: 'var(--neutral-500)', maxWidth: 500, margin: '0 auto' }}>
+            Three simple steps to discover your government benefits
+          </p>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            {steps.map((step, i) => (
+              <div key={i} className="card p-8 text-center relative overflow-hidden group">
+                {/* Step number */}
+                <div className="absolute top-4 right-4 text-6xl font-black" style={{ color: 'var(--neutral-100)', lineHeight: 1 }}>{i + 1}</div>
+                
+                <div className="relative z-10">
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-6 transition-transform group-hover:scale-110" style={{ background: `${step.color}15` }}>
+                    <step.icon size={28} style={{ color: step.color }} />
+                  </div>
+                  <h3 className="text-xl font-bold mb-3" style={{ color: 'var(--neutral-900)' }}>{step.title}</h3>
+                  <p className="text-sm leading-relaxed" style={{ color: 'var(--neutral-600)' }}>{step.desc}</p>
                 </div>
-                <h3 className="text-xl font-bold mb-3" style={{ color: 'var(--neutral-900)' }}>{step.title}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: 'var(--neutral-600)' }}>{step.desc}</p>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
       {/* SCHEME CATEGORIES */}
-      <section className="py-16 px-4" style={{ background: 'var(--neutral-100)' }}>
-        <div style={{ maxWidth: 'var(--max-width)', margin: '0 auto' }}>
+      <section className="py-16 mt-12" style={{ background: 'var(--neutral-100)' }}>
+        <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-2" style={{ color: 'var(--neutral-900)' }}>Covering Every Area of Your Life</h2>
           <p className="text-center mb-10" style={{ color: 'var(--neutral-500)' }}>From farming to education, health to housing</p>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {categories.map((cat, i) => (
-              <div key={i} className="card p-5 text-center cursor-pointer group" style={{ animationDelay: `${i * 0.05}s` }}>
+              <div key={i} className="card p-5 rounded-2xl min-h-[160px] h-full flex flex-col items-center justify-center text-center cursor-pointer group" style={{ animationDelay: `${i * 0.05}s` }}>
                 <span className="text-3xl mb-3 block group-hover:scale-125 transition-transform">{cat.icon}</span>
-                <h3 className="text-sm font-semibold mb-1" style={{ color: 'var(--neutral-800)' }}>{cat.label}</h3>
+                <h3 className="text-sm font-semibold mb-1 w-full truncate" style={{ color: 'var(--neutral-800)' }}>{cat.label}</h3>
                 <span className="text-xs" style={{ color: 'var(--primary-600)' }}>{cat.count} schemes</span>
               </div>
             ))}
@@ -176,34 +178,37 @@ export default function LandingPage() {
       </section>
 
       {/* TESTIMONIALS */}
-      <section className="py-16 px-4" style={{ maxWidth: 'var(--max-width)', margin: '0 auto' }}>
-        <h2 className="text-3xl font-bold text-center mb-10" style={{ color: 'var(--neutral-900)' }}>Real Stories from Real People</h2>
-        <div className="grid md:grid-cols-3 gap-6">
-          {[
-            { name: "Ramesh Kumar", loc: "Varanasi, UP", text: "I didn't know I was eligible for PM-KISAN. Jan Saathi found it and 4 other schemes for me. I'm now getting ₹6,000 per year directly!", avatar: "RK" },
-            { name: "Sunita Devi", loc: "Yavatmal, Maharashtra", text: "As a widow with two children, I discovered 7 schemes I never knew about. The step-by-step guide made it so easy to apply.", avatar: "SD" },
-            { name: "Murugan S.", loc: "Thanjavur, Tamil Nadu", text: "My father got his Ayushman Bharat card within a week after following the steps here. Saved us ₹2 lakh on his surgery!", avatar: "MS" },
-          ].map((t, i) => (
-            <div key={i} className="card p-6">
-              <div className="flex gap-1 mb-3">
-                {[1,2,3,4,5].map(s => <Star key={s} size={14} fill="var(--warning-500)" color="var(--warning-500)" />)}
-              </div>
-              <p className="text-sm mb-4 leading-relaxed" style={{ color: 'var(--neutral-700)' }}>"{t.text}"</p>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold" style={{ background: 'linear-gradient(135deg, var(--primary-500), var(--accent-500))' }}>{t.avatar}</div>
-                <div>
-                  <div className="text-sm font-semibold" style={{ color: 'var(--neutral-800)' }}>{t.name}</div>
-                  <div className="text-xs" style={{ color: 'var(--neutral-500)' }}>{t.loc}</div>
+      <section className="py-16 mt-16">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-10" style={{ color: 'var(--neutral-900)' }}>Real Stories from Real People</h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              { name: "Ramesh Kumar", loc: "Varanasi, UP", text: "I didn't know I was eligible for PM-KISAN. Jan Saathi found it and 4 other schemes for me. I'm now getting ₹6,000 per year directly!", avatar: "RK" },
+              { name: "Sunita Devi", loc: "Yavatmal, Maharashtra", text: "As a widow with two children, I discovered 7 schemes I never knew about. The step-by-step guide made it so easy to apply.", avatar: "SD" },
+              { name: "Murugan S.", loc: "Thanjavur, Tamil Nadu", text: "My father got his Ayushman Bharat card within a week after following the steps here. Saved us ₹2 lakh on his surgery!", avatar: "MS" },
+            ].map((t, i) => (
+              <div key={i} className="card p-6">
+                <div className="flex gap-1 mb-3">
+                  {[1,2,3,4,5].map(s => <Star key={s} size={14} fill="var(--warning-500)" color="var(--warning-500)" />)}
+                </div>
+                <p className="text-sm mb-4 leading-relaxed" style={{ color: 'var(--neutral-700)' }}>"{t.text}"</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold" style={{ background: 'linear-gradient(135deg, var(--primary-500), var(--accent-500))' }}>{t.avatar}</div>
+                  <div>
+                    <div className="text-sm font-semibold" style={{ color: 'var(--neutral-800)' }}>{t.name}</div>
+                    <div className="text-xs" style={{ color: 'var(--neutral-500)' }}>{t.loc}</div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
       {/* FAQ */}
-      <section className="py-16 px-4" style={{ background: 'var(--neutral-100)' }}>
-        <div style={{ maxWidth: 700, margin: '0 auto' }}>
+      <section className="py-16" style={{ background: 'var(--neutral-100)' }}>
+        <div className="max-w-6xl mx-auto px-4">
+          <div style={{ maxWidth: 700, margin: '0 auto' }}>
           <h2 className="text-3xl font-bold text-center mb-10" style={{ color: 'var(--neutral-900)' }}>Frequently Asked Questions</h2>
           <div className="flex flex-col gap-3">
             {faqs.map((faq, i) => (
@@ -218,22 +223,25 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
+          </div>
         </div>
       </section>
 
       {/* FINAL CTA */}
-      <section className="py-20 px-4 text-center" style={{ background: 'linear-gradient(135deg, var(--primary-600), var(--accent-600))' }}>
-        <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Ready to find your benefits?</h2>
-        <p className="text-lg mb-8" style={{ color: 'rgba(255,255,255,0.85)' }}>It takes just 5 minutes. No signup needed.</p>
-        <Link href="/onboarding" className="btn btn-lg" style={{ background: 'white', color: 'var(--primary-700)', padding: '18px 40px', fontSize: 18, borderRadius: 16 }}>
-          {t(language, 'heroCTA')}
-          <ArrowRight size={20} />
-        </Link>
+      <section className="py-16 text-center" style={{ background: 'linear-gradient(135deg, var(--primary-600), var(--accent-600))' }}>
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Ready to find your benefits?</h2>
+          <p className="text-lg mb-8" style={{ color: 'rgba(255,255,255,0.85)' }}>It takes just 5 minutes. No signup needed.</p>
+          <Link href="/onboarding" className="btn btn-lg" style={{ background: 'white', color: 'var(--primary-700)', padding: '18px 40px', fontSize: 18, borderRadius: 16 }}>
+            {t(language, 'heroCTA')}
+            <ArrowRight size={20} />
+          </Link>
+        </div>
       </section>
 
       {/* FOOTER */}
-      <footer className="py-10 px-4" style={{ background: 'var(--neutral-900)' }}>
-        <div className="text-center">
+      <footer className="py-12" style={{ background: 'var(--neutral-900)' }}>
+        <div className="max-w-6xl mx-auto px-4 text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
             <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'linear-gradient(135deg, var(--primary-500), var(--accent-500))' }}>
               <span className="text-white font-bold text-sm">जन</span>
