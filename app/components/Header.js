@@ -20,7 +20,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 glass" style={{ zIndex: 70, borderBottom: '1px solid var(--neutral-200)' }}>
+      <header className="fixed top-0 left-0 right-0 z-[70] glass" style={{ borderBottom: '1px solid var(--neutral-200)' }}>
         <div className="announcement-bar" style={{ maxWidth: 'var(--max-width)', margin: '0 auto' }}>
           <span className="text-xs sm:text-sm" style={{ color: 'var(--neutral-600)' }}>{t(language, 'tagline')}</span>
           <span className="text-xs sm:text-sm" style={{ color: 'var(--neutral-500)' }}>{t(language, 'trustSignals')}</span>
