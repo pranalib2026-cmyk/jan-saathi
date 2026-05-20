@@ -20,8 +20,13 @@ export default function Header() {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 glass" style={{ borderBottom: '1px solid var(--neutral-200)' }}>
-        <div className="flex items-center justify-between px-4 lg:px-8" style={{ height: 'var(--header-height)', maxWidth: 'var(--max-width)', margin: '0 auto' }}>
+      <header className="fixed top-0 left-0 right-0 glass" style={{ zIndex: 70, borderBottom: '1px solid var(--neutral-200)' }}>
+        <div className="announcement-bar" style={{ maxWidth: 'var(--max-width)', margin: '0 auto' }}>
+          <span className="text-xs sm:text-sm" style={{ color: 'var(--neutral-600)' }}>{t(language, 'tagline')}</span>
+          <span className="text-xs sm:text-sm" style={{ color: 'var(--neutral-500)' }}>{t(language, 'trustSignals')}</span>
+        </div>
+
+        <div className="navbar justify-between" style={{ height: 'var(--header-height)', maxWidth: 'var(--max-width)', margin: '0 auto' }}>
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 no-underline">
             <div className="flex items-center justify-center rounded-xl" style={{ width: 36, height: 36, background: 'linear-gradient(135deg, var(--primary-500), var(--accent-500))' }}>
@@ -88,7 +93,7 @@ export default function Header() {
       {sidebarOpen && (
         <div className="fixed inset-0 z-40 md:hidden">
           <div className="absolute inset-0 bg-black/30" onClick={toggleSidebar} />
-          <div className="absolute right-0 top-0 bottom-0 w-72 bg-white shadow-xl animate-slide-left" style={{ paddingTop: 'var(--header-height)' }}>
+          <div className="absolute right-0 top-0 bottom-0 w-72 bg-white shadow-xl animate-slide-left" style={{ paddingTop: 'var(--header-total-height)' }}>
             <nav className="p-4 flex flex-col gap-1">
               {navItems.map(item => (
                 <Link key={item.href} href={item.href} onClick={toggleSidebar}

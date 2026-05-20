@@ -64,7 +64,7 @@ export default function LandingPage() {
       <Header />
       
       {/* HERO SECTION */}
-      <section className="hero-gradient relative overflow-hidden" style={{ paddingTop: 'calc(var(--header-height) + 40px)', paddingBottom: 80 }}>
+      <section className="hero-gradient relative overflow-hidden" style={{ paddingTop: 'calc(var(--header-total-height) + 40px)', paddingBottom: 80 }}>
         {/* Decorative elements */}
         <div className="absolute top-20 left-10 w-72 h-72 rounded-full opacity-20 animate-float" style={{ background: 'radial-gradient(circle, var(--primary-300), transparent)', filter: 'blur(40px)' }} />
         <div className="absolute bottom-10 right-10 w-96 h-96 rounded-full opacity-15 animate-float" style={{ background: 'radial-gradient(circle, var(--accent-300), transparent)', filter: 'blur(60px)', animationDelay: '1.5s' }} />
@@ -158,14 +158,14 @@ export default function LandingPage() {
       </section>
 
       {/* SCHEME CATEGORIES */}
-      <section className="py-16 px-4" style={{ background: 'var(--neutral-100)' }}>
-        <div style={{ maxWidth: 'var(--max-width)', margin: '0 auto' }}>
+      <section className="section category-section px-4" style={{ background: 'var(--neutral-100)' }}>
+        <div className="container">
           <h2 className="text-3xl font-bold text-center mb-2" style={{ color: 'var(--neutral-900)' }}>Covering Every Area of Your Life</h2>
           <p className="text-center mb-10" style={{ color: 'var(--neutral-500)' }}>From farming to education, health to housing</p>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="category-grid">
             {categories.map((cat, i) => (
-              <div key={i} className="card p-5 text-center cursor-pointer group" style={{ animationDelay: `${i * 0.05}s` }}>
+              <div key={i} className="card category-card text-center cursor-pointer group" style={{ animationDelay: `${i * 0.05}s` }}>
                 <span className="text-3xl mb-3 block group-hover:scale-125 transition-transform">{cat.icon}</span>
                 <h3 className="text-sm font-semibold mb-1" style={{ color: 'var(--neutral-800)' }}>{cat.label}</h3>
                 <span className="text-xs" style={{ color: 'var(--primary-600)' }}>{cat.count} schemes</span>
