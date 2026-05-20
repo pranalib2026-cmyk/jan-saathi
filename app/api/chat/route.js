@@ -68,44 +68,50 @@ PM-KISAN, Ayushman Bharat, PM Awas Yojana, MGNREGA, Ujjwala Yojana, Jan Dhan, PM
     // Try endpoints in order; fall back if DNS or network error occurs
     let response;
     let lastErr;
-    const timeout = 15000; // 15s
+    const timeoutBase = 10000; // base 10s
 
     for (const url of OPENROUTER_URLS) {
-      try {
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), timeout);
+      // small retry loop per-endpoint
+      for (let attempt = 0; attempt < 2; attempt++) {
         try {
-          response = await fetch(url, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${apiKey}`,
-            },
-            body: JSON.stringify({ model: "gpt-4o-mini", messages: chatMessages, temperature: 0.2, max_tokens: 1024 }),
-            signal: controller.signal,
-          });
-        } finally {
-          clearTimeout(timer);
-        }
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), timeoutBase * (attempt + 1));
+          try {
+            response = await fetch(url, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${apiKey}`,
+              },
+              body: JSON.stringify({ model: "gpt-4o-mini", messages: chatMessages, temperature: 0.2, max_tokens: 1024 }),
+              signal: controller.signal,
+            });
+          } finally {
+            clearTimeout(timer);
+          }
 
-        // If we got a response (even an error code), stop trying other endpoints
-        if (response) {
-          if (!response.ok) console.warn(`OpenRouter response from ${url} returned status ${response.status}`);
-          break;
+          // If we got a response (even an error code), stop trying other endpoints
+          if (response) {
+            if (!response.ok) console.warn(`OpenRouter response from ${url} returned status ${response.status}`);
+            break;
+          }
+        } catch (err) {
+          lastErr = err;
+          console.warn(`OpenRouter request to ${url} failed (attempt ${attempt + 1}):`, err.message || err);
+          // brief backoff before retrying same endpoint
+          await new Promise((r) => setTimeout(r, 300 * (attempt + 1)));
+          continue;
         }
-      } catch (err) {
-        lastErr = err;
-        // continue to next endpoint on network/DNS/timeout errors
-        console.warn(`OpenRouter request to ${url} failed:`, err.message || err);
-        continue;
       }
+      if (response) break;
     }
 
     if (!response) {
       console.error("All OpenRouter endpoints failed:", lastErr);
+      const errMsg = lastErr && lastErr.message ? lastErr.message : String(lastErr || 'unknown error');
       return NextResponse.json({
         message:
-          "AI service unreachable. Please check your network or try again later. If the problem persists, open an issue or check your OpenRouter endpoint configuration.",
+          `AI service unreachable (${errMsg}). Please check your network, DNS, or OPENROUTER_URL / OPENROUTER_API_KEY settings.`,
       });
     }
 
