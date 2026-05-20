@@ -19,9 +19,9 @@ export default function BottomNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden glass" style={{ borderTop: '1px solid var(--neutral-200)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
-      <div className="flex items-center justify-around py-2">
+      <div className="flex items-center justify-around" style={{ height: 'var(--bottom-nav-height)' }}>
         {items.map(item => {
-          const active = pathname === item.href;
+          const active = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
           return (
             <Link key={item.href} href={item.href}
               className="flex flex-col items-center gap-1 py-1 px-3 rounded-lg no-underline transition-all"

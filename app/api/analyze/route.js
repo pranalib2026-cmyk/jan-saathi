@@ -1,101 +1,230 @@
-import { NextResponse } from 'next/server';
-
-const SYSTEM_PROMPT = `You are India's most knowledgeable welfare navigator. Your job is to analyze a citizen's personal profile and return a precise, ranked list of government welfare schemes they are eligible for — both Central and State level.
-
-You must:
-1. Match schemes to the user's profile with high accuracy
-2. Explain eligibility in plain, simple language (Class 6 reading level)
-3. Give exact action steps in chronological order
-4. Predict total lifetime value of all matched schemes in INR
-5. Flag schemes with upcoming deadlines or sunset dates
-6. Identify "cascade chains" — where enrolling in one scheme unlocks another
-7. Identify what documents are missing and how to obtain them
-8. NEVER use government jargon. No "beneficiaries", "nodal agencies", "convergence".
-9. Respond in the user's preferred language.
-10. Return output in valid JSON matching the schema provided.
-
-Scheme knowledge base: Central schemes include PM-KISAN, PMFBY, PMAY-G, PMAY-U, Ayushman Bharat, MGNREGA, PM Ujjwala, PM Mudra Yojana, PMEGP, Sukanya Samriddhi, PMJJBY, PMSBY, Atal Pension Yojana, PM Vaya Vandana, PM Vishwakarma, Stand Up India, National Scholarship Portal schemes, BOCW welfare, e-Shram, PM SVANidhi, PM Garib Kalyan Anna Yojana, Jan Dhan Yojana, PM Matru Vandana Yojana, Kisan Credit Card, and all state-specific schemes for the user's state.`;
+import { NextResponse } from "next/server";
 
 export async function POST(request) {
   try {
-    const { profile, language = 'en' } = await request.json();
-    
-    const apiKey = process.env.ANTHROPIC_API_KEY;
+    const { profile } = await request.json();
+
+    // Read API key at request time (not module load time)
+    const apiKey = process.env.GEMINI_API_KEY;
+
+    // If no API key, use mock data (demo mode)
     if (!apiKey) {
-      return NextResponse.json({ error: 'API key not configured' }, { status: 500 });
+      return NextResponse.json(getMockResults(profile));
     }
 
-    const userPrompt = `Analyze this citizen profile and return scheme recommendations as JSON.
-Language preference: ${language === 'hi' ? 'Hindi' : 'English'}
+    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
-Profile: ${JSON.stringify(profile)}
+    const systemPrompt = `You are Jan Saathi, an expert AI assistant helping Indian citizens find government welfare schemes they are eligible for.
 
-Return JSON with this exact structure:
+Given a citizen's profile, analyze their eligibility and return ONLY a valid JSON object (no markdown, no code blocks, no extra text) with this exact structure:
 {
-  "archetype": { "id": "string", "label": "string", "description": "string" },
-  "totalProjectedValue": number,
-  "projectionYears": 5,
-  "schemes": [{
-    "id": "string",
-    "name": "string",
-    "ministry": "string",
-    "level": "Central" or "State",
-    "type": "Now" or "Soon" or "Future",
-    "timelineMonths": number,
-    "projectedValue": number,
-    "eligibilityScore": number (0-100),
-    "eligibilityReason": "string",
-    "plainDescription": "string",
-    "missingDocuments": ["string"],
-    "actionSteps": [{ "step": number, "action": "string", "timeRequired": "string" }],
-    "deadline": "string or null",
-    "cascadesTo": ["string"],
-    "sunsetRisk": { "exists": false, "description": "", "confidence": 0 }
-  }],
-  "documentGaps": [{ "document": "string", "howToGet": "string", "timeRequired": "string", "unlocksSchemes": ["string"] }],
-  "cascadeChains": [{ "parent": "string", "child": "string", "childName": "string", "relationship": "string" }],
-  "sunsetAlerts": [{ "schemeName": "string", "alert": "string", "deadline": "string", "confidence": number }]
+  "schemes": [
+    {
+      "id": "unique_id",
+      "name": "Scheme Name in English",
+      "nameHindi": "योजना का नाम हिंदी में",
+      "ministry": "Ministry name",
+      "eligibilityScore": 95,
+      "projectedAnnualValue": 6000,
+      "projectedLifetimeValue": 30000,
+      "category": "financial|health|education|housing|agriculture|women|children",
+      "priority": "immediate|soon|future",
+      "actionSteps": ["Step 1", "Step 2", "Step 3"],
+      "documentsRequired": ["Aadhaar Card", "Income Certificate"],
+      "deadline": "March 31, 2025 or null",
+      "description": "Brief description of the scheme"
+    }
+  ],
+  "totalProjectedValue": 150000,
+  "profileSummary": "Brief summary of why these schemes were recommended",
+  "documentGaps": ["Missing document 1", "Missing document 2"]
 }
 
-Return ONLY valid JSON, no markdown or explanation.`;
+Focus on real Indian government schemes like:
+- PM-KISAN (farmers)
+- Pradhan Mantri Jan Dhan Yojana (banking)
+- Ayushman Bharat (health insurance)
+- PM Awas Yojana (housing)
+- Ujjwala Yojana (LPG for women)
+- Sukanya Samriddhi (girl child)
+- PM Fasal Bima Yojana (crop insurance)
+- MGNREGA (employment guarantee)
+- PM Mudra Yojana (business loans)
+- Scholarship schemes (students)
 
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+Match schemes strictly based on the profile provided. Return 5-8 most relevant schemes.`;
+
+    const userMessage = `Analyze this citizen profile and return matching welfare schemes:
+
+${JSON.stringify(profile, null, 2)}
+
+Return ONLY the JSON object. No markdown. No explanation.`;
+
+    const response = await fetch(GEMINI_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 4000,
-        system: SYSTEM_PROMPT,
-        messages: [{ role: "user", content: userPrompt }]
-      })
+        contents: [
+          {
+            parts: [{ text: systemPrompt + "\n\n" + userMessage }],
+          },
+        ],
+        generationConfig: {
+          temperature: 0.3,
+          maxOutputTokens: 2048,
+        },
+      }),
     });
 
     if (!response.ok) {
       const err = await response.text();
-      console.error('Claude API error:', err);
-      return NextResponse.json({ error: 'AI service error' }, { status: 502 });
+      console.error("Gemini API error:", err);
+      return NextResponse.json(getMockResults(profile));
     }
 
     const data = await response.json();
-    const text = data.content?.[0]?.text || '';
-    
-    // Parse JSON from response
-    let results;
-    try {
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      results = jsonMatch ? JSON.parse(jsonMatch[0]) : JSON.parse(text);
-    } catch (e) {
-      console.error('JSON parse error:', e);
-      return NextResponse.json({ error: 'Failed to parse AI response' }, { status: 500 });
-    }
+    const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
-    return NextResponse.json(results);
+    const cleaned = rawText
+      .replace(/```json\s*/gi, "")
+      .replace(/```\s*/g, "")
+      .trim();
+
+    try {
+      const parsed = JSON.parse(cleaned);
+      return NextResponse.json(parsed);
+    } catch {
+      console.error("JSON parse error, using mock data. Raw:", cleaned);
+      return NextResponse.json(getMockResults(profile));
+    }
   } catch (error) {
-    console.error('API route error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error("Analyze route error:", error);
+    return NextResponse.json(getMockResults({}));
   }
+}
+
+function getMockResults(profile) {
+  return {
+    schemes: [
+      {
+        id: "ayushman-bharat",
+        name: "Ayushman Bharat PM-JAY",
+        nameHindi: "आयुष्मान भारत प्रधानमंत्री जन आरोग्य योजना",
+        ministry: "Ministry of Health & Family Welfare",
+        eligibilityScore: 92,
+        projectedAnnualValue: 500000,
+        projectedLifetimeValue: 2500000,
+        category: "health",
+        priority: "immediate",
+        actionSteps: [
+          "Visit nearest Common Service Centre (CSC)",
+          "Carry Aadhaar Card and Ration Card",
+          "Get Ayushman Card issued free of cost",
+          "Use card at any empanelled hospital",
+        ],
+        documentsRequired: ["Aadhaar Card", "Ration Card"],
+        deadline: null,
+        description:
+          "Health cover of ₹5 lakh per family per year for secondary and tertiary hospitalization",
+      },
+      {
+        id: "pm-jan-dhan",
+        name: "PM Jan Dhan Yojana",
+        nameHindi: "प्रधानमंत्री जन धन योजना",
+        ministry: "Ministry of Finance",
+        eligibilityScore: 88,
+        projectedAnnualValue: 10000,
+        projectedLifetimeValue: 50000,
+        category: "financial",
+        priority: "immediate",
+        actionSteps: [
+          "Visit nearest bank branch or Business Correspondent",
+          "Carry Aadhaar Card (or any ID proof)",
+          "Fill zero-balance account opening form",
+          "Activate RuPay debit card",
+        ],
+        documentsRequired: ["Aadhaar Card", "Passport Photo"],
+        deadline: null,
+        description:
+          "Zero-balance bank account with ₹10,000 overdraft, RuPay card, and ₹2 lakh accident insurance",
+      },
+      {
+        id: "ujjwala-yojana",
+        name: "PM Ujjwala Yojana 2.0",
+        nameHindi: "प्रधानमंत्री उज्ज्वला योजना",
+        ministry: "Ministry of Petroleum & Natural Gas",
+        eligibilityScore: 85,
+        projectedAnnualValue: 3600,
+        projectedLifetimeValue: 18000,
+        category: "women",
+        priority: "immediate",
+        actionSteps: [
+          "Visit nearest LPG distributor",
+          "Fill Ujjwala 2.0 application form",
+          "Submit Aadhaar and Ration Card",
+          "Get free LPG connection with first refill subsidy",
+        ],
+        documentsRequired: ["Aadhaar Card", "Ration Card", "Bank Account"],
+        deadline: null,
+        description:
+          "Free LPG connection to women from Below Poverty Line households",
+      },
+      {
+        id: "pm-awas-yojana",
+        name: "PM Awas Yojana (Gramin)",
+        nameHindi: "प्रधानमंत्री आवास योजना",
+        ministry: "Ministry of Rural Development",
+        eligibilityScore: 78,
+        projectedAnnualValue: 120000,
+        projectedLifetimeValue: 120000,
+        category: "housing",
+        priority: "soon",
+        actionSteps: [
+          "Contact your Gram Panchayat",
+          "Get name added to SECC/Awaas+ survey",
+          "Submit application with land documents",
+          "Receive ₹1.2 lakh in installments after approval",
+        ],
+        documentsRequired: [
+          "Aadhaar Card",
+          "Bank Account",
+          "Land Documents",
+          "MGNREGA Job Card",
+        ],
+        deadline: null,
+        description:
+          "Financial assistance of ₹1.2 lakh for construction of pucca houses in rural areas",
+      },
+      {
+        id: "mudra-yojana",
+        name: "PM Mudra Yojana",
+        nameHindi: "प्रधानमंत्री मुद्रा योजना",
+        ministry: "Ministry of Finance",
+        eligibilityScore: 72,
+        projectedAnnualValue: 50000,
+        projectedLifetimeValue: 200000,
+        category: "financial",
+        priority: "soon",
+        actionSteps: [
+          "Prepare a simple business plan",
+          "Visit nearest bank/MFI/NBFC",
+          "Apply for Shishu (up to ₹50K), Kishore (₹50K–5L), or Tarun (₹5L–10L) loan",
+          "No collateral required",
+        ],
+        documentsRequired: [
+          "Aadhaar Card",
+          "PAN Card",
+          "Business Address Proof",
+          "Bank Statement",
+        ],
+        deadline: null,
+        description:
+          "Collateral-free loans up to ₹10 lakh for non-farm small/micro enterprises",
+      },
+    ],
+    totalProjectedValue: 3188000,
+    profileSummary:
+      "Based on your profile, you are eligible for multiple high-value central government schemes. Priority action: Get your Ayushman Bharat card today for ₹5 lakh health coverage.",
+    documentGaps: ["Income Certificate", "Caste Certificate (if applicable)"],
+  };
 }

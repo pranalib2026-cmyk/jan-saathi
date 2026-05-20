@@ -19,18 +19,18 @@ const sections = [
 function OptionButton({ selected, onClick, children, style }) {
   return (
     <button onClick={onClick} className="text-left p-4 rounded-xl border-2 transition-all" style={{
-      borderColor: selected ? 'var(--primary-500)' : 'var(--neutral-200)',
-      background: selected ? 'var(--primary-50)' : 'white',
+      borderColor: selected ? 'rgba(61,129,227,0.7)' : 'rgba(255,255,255,0.12)',
+      background: selected ? 'rgba(61,129,227,0.18)' : 'rgba(255,255,255,0.04)',
       cursor: 'pointer', width: '100%', ...style
     }}>
       <div className="flex items-center gap-3">
         <div className="w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0" style={{
-          borderColor: selected ? 'var(--primary-500)' : 'var(--neutral-300)',
-          background: selected ? 'var(--primary-500)' : 'transparent'
+          borderColor: selected ? 'rgba(61,129,227,0.85)' : 'rgba(255,255,255,0.16)',
+          background: selected ? 'rgba(61,129,227,1)' : 'transparent'
         }}>
           {selected && <Check size={12} color="white" />}
         </div>
-        <span className="text-sm font-medium" style={{ color: 'var(--neutral-800)' }}>{children}</span>
+        <span className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.86)' }}>{children}</span>
       </div>
     </button>
   );
@@ -39,20 +39,20 @@ function OptionButton({ selected, onClick, children, style }) {
 function CheckboxButton({ checked, onChange, children, emoji }) {
   return (
     <button onClick={() => onChange(!checked)} className="text-left p-3 rounded-xl border-2 transition-all" style={{
-      borderColor: checked ? 'var(--primary-500)' : 'var(--neutral-200)',
-      background: checked ? 'var(--primary-50)' : 'white',
+      borderColor: checked ? 'rgba(61,129,227,0.7)' : 'rgba(255,255,255,0.12)',
+      background: checked ? 'rgba(61,129,227,0.18)' : 'rgba(255,255,255,0.04)',
       cursor: 'pointer', width: '100%',
     }}>
       <div className="flex items-center gap-3">
         <div className="w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0" style={{
-          borderColor: checked ? 'var(--primary-500)' : 'var(--neutral-300)',
-          background: checked ? 'var(--primary-500)' : 'transparent',
+          borderColor: checked ? 'rgba(61,129,227,0.85)' : 'rgba(255,255,255,0.16)',
+          background: checked ? 'rgba(61,129,227,1)' : 'transparent',
           borderRadius: 4,
         }}>
           {checked && <Check size={12} color="white" />}
         </div>
         {emoji && <span>{emoji}</span>}
-        <span className="text-sm" style={{ color: 'var(--neutral-700)' }}>{children}</span>
+        <span className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>{children}</span>
       </div>
     </button>
   );
@@ -63,12 +63,12 @@ function Tooltip({ text }) {
   return (
     <span className="relative inline-flex ml-1">
       <button onClick={() => setShow(!show)} className="flex items-center" style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
-        <HelpCircle size={15} style={{ color: 'var(--neutral-400)' }} />
+        <HelpCircle size={15} style={{ color: 'rgba(255,255,255,0.5)' }} />
       </button>
       {show && (
-        <div className="absolute left-0 bottom-full mb-2 p-3 rounded-lg shadow-lg text-xs z-10 animate-fade-in-down" style={{ background: 'var(--neutral-800)', color: 'white', width: 250 }}>
+        <div className="absolute left-0 bottom-full mb-2 p-3 rounded-lg shadow-lg text-xs z-10 animate-fade-in-down glass-dark" style={{ width: 250 }}>
           {text}
-          <button onClick={() => setShow(false)} className="block mt-2 text-xs underline" style={{ background: 'none', border: 'none', color: 'var(--neutral-400)', cursor: 'pointer', padding: 0 }}>Got it</button>
+          <button onClick={() => setShow(false)} className="block mt-2 text-xs underline" style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', padding: 0 }}>Got it</button>
         </div>
       )}
     </span>
@@ -92,7 +92,7 @@ export default function OnboardingPage() {
   const districts = stateDistricts[profile.state] || [];
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--neutral-50)' }}>
+    <div className="min-h-screen" style={{ background: 'transparent' }}>
       <Header />
       <div style={{ paddingTop: 80, maxWidth: 640, marginLeft: 'auto', marginRight: 'auto', paddingLeft: 16, paddingRight: 16, paddingBottom: 100 }}>
         {/* Progress */}
@@ -117,7 +117,7 @@ export default function OnboardingPage() {
         </div>
 
         {/* Section Title */}
-        <h2 className="text-2xl font-bold mb-6 animate-fade-in" style={{ color: 'var(--neutral-900)' }}>{T(sections[step].key)}</h2>
+        <h2 className="text-2xl font-bold mb-6 animate-fade-in" style={{ color: 'white' }}>{T(sections[step].key)}</h2>
 
         {/* SECTION A: Identity */}
         {step === 0 && (
