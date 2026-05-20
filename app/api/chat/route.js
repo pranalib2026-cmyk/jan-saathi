@@ -26,9 +26,10 @@ export async function POST(request) {
       });
     }
 
+    // Prefer the official API host first. Allow overriding with OPENROUTER_URL.
     const OPENROUTER_URLS = [
-      process.env.OPENROUTER_URL || "https://openrouter.ai/v1/chat/completions",
-      "https://api.openrouter.ai/v1/chat/completions",
+      process.env.OPENROUTER_URL || "https://api.openrouter.ai/v1/chat/completions",
+      "https://openrouter.ai/v1/chat/completions",
     ];
 
     const systemPrompt = `You are Unnati (उन्नति), a friendly and knowledgeable AI assistant helping Indian citizens navigate government welfare schemes.
