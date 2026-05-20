@@ -167,9 +167,9 @@ export default function LandingPage() {
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {categories.map((cat, i) => (
-              <div key={i} className="card p-5 rounded-2xl min-h-[160px] h-full flex flex-col items-center justify-center text-center cursor-pointer group" style={{ animationDelay: `${i * 0.05}s` }}>
+              <div key={i} className="card p-5 rounded-2xl h-full flex flex-col items-center justify-center text-center cursor-pointer group" style={{ animationDelay: `${i * 0.05}s`, minHeight: 'var(--category-card-min-height)' }}>
                 <span className="text-3xl mb-3 block group-hover:scale-125 transition-transform">{cat.icon}</span>
-                <h3 className="text-sm font-semibold mb-1 w-full truncate" style={{ color: 'var(--neutral-800)' }}>{cat.label}</h3>
+                <h3 className="text-sm font-semibold mb-1 w-full" style={{ color: 'var(--neutral-800)', minHeight: 'var(--category-title-min-height)' }}>{cat.label}</h3>
                 <span className="text-xs" style={{ color: 'var(--primary-600)' }}>{cat.count} schemes</span>
               </div>
             ))}
