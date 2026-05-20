@@ -67,7 +67,7 @@ export default function ChatPage() {
   return (
     <div className="min-h-screen flex flex-col" style={{ background: 'var(--neutral-50)' }}>
       <Header />
-      <div className="flex-1 flex flex-col" style={{ paddingTop: 'var(--header-height)', maxWidth: 700, margin: '0 auto', width: '100%' }}>
+      <div className="flex-1 flex flex-col" style={{ paddingTop: 'var(--header-total-height)', maxWidth: 700, margin: '0 auto', width: '100%' }}>
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4" style={{ paddingBottom: 140 }}>
           {chatMessages.length === 0 && (

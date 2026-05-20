@@ -125,7 +125,7 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen" style={{ background: 'var(--neutral-50)' }}>
         <Header />
-        <div style={{ paddingTop: 'calc(var(--header-height) + 40px)' }}>
+        <div style={{ paddingTop: 'calc(var(--header-total-height) + 40px)' }}>
           <div className="text-center mb-8 px-4">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 animate-pulse-soft" style={{ background: 'var(--primary-100)' }}>
               <Sparkles size={28} style={{ color: 'var(--primary-500)' }} />
@@ -147,7 +147,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen" style={{ background: 'var(--neutral-50)', paddingBottom: 80 }}>
       <Header />
-      <div style={{ paddingTop: 80, maxWidth: 700, marginLeft: 'auto', marginRight: 'auto', paddingLeft: 16, paddingRight: 16 }}>
+      <div style={{ paddingTop: 'calc(var(--header-total-height) + 16px)', maxWidth: 700, marginLeft: 'auto', marginRight: 'auto', paddingLeft: 16, paddingRight: 16 }}>
         {/* Profile Summary Bar */}
         <div className="card p-4 flex items-center gap-4 animate-fade-in">
           <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0" style={{ background: 'linear-gradient(135deg, var(--primary-500), var(--accent-500))' }}>
