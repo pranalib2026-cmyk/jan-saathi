@@ -168,7 +168,16 @@ PM-KISAN, Ayushman Bharat, PM Awas Yojana, MGNREGA, Ujjwala Yojana, Jan Dhan, PM
       });
     }
 
-    const data = await response.json();
+    let data;
+    try {
+      data = await response.json();
+    } catch (parseErr) {
+      const raw = await response.text().catch(() => null);
+      console.error('Failed to parse JSON from OpenRouter response:', parseErr, 'raw:', raw);
+      return NextResponse.json({
+        message: `AI service returned invalid JSON (${parseErr.message}). Raw response: ${raw ? raw.slice(0, 300) : '<empty>'}`,
+      });
+    }
 
     // Extract reply text from common completion shapes
     let replyText = "I apologize, I could not generate a response. Please try again.";
