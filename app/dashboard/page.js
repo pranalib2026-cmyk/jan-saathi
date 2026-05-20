@@ -9,6 +9,98 @@ import Header from '../components/Header';
 import BottomNav from '../components/BottomNav';
 import { TrendingUp, Clock, ArrowRight, ChevronDown, ChevronUp, AlertTriangle, FileText, Link2, Shield, MapPin, Briefcase, Edit, Sparkles, CheckCircle2, Circle, Timer } from 'lucide-react';
 
+// Normalize API response to dashboard-compatible format
+// Handles both Gemini format (priority/projectedLifetimeValue) and legacy format (type/projectedValue)
+function normalizeResults(data) {
+  if (!data) return null;
+
+  // If data already has the legacy format with .type on schemes, return as-is
+  const firstScheme = data.schemes?.[0];
+  if (firstScheme?.type && firstScheme?.projectedValue !== undefined) return data;
+
+  // Map priority → type
+  const priorityToType = { immediate: 'Now', soon: 'Soon', future: 'Future' };
+
+  const schemes = (data.schemes || []).map(s => ({
+    id: s.id,
+    name: s.name,
+    nameHindi: s.nameHindi || '',
+    ministry: s.ministry || '',
+    level: 'Central',
+    type: priorityToType[s.priority?.toLowerCase()] || s.type || 'Now',
+    timelineMonths: s.priority === 'immediate' ? 1 : s.priority === 'soon' ? 6 : 24,
+    projectedValue: s.projectedLifetimeValue || s.projectedValue || 0,
+    eligibilityScore: s.eligibilityScore || 80,
+    eligibilityReason: s.description || s.eligibilityReason || '',
+    plainDescription: s.description || s.plainDescription || '',
+    missingDocuments: s.missingDocuments || [],
+    documentsRequired: s.documentsRequired || [],
+    // Handle both string[] and object[] actionSteps
+    actionSteps: (s.actionSteps || []).map((step, i) => {
+      if (typeof step === 'string') {
+        return { step: i + 1, action: step, timeRequired: '—' };
+      }
+      return step;
+    }),
+    deadline: s.deadline || null,
+    applicationLink: s.applicationLink || null,
+    category: s.category || '',
+  }));
+
+  // Build documentGaps from string[] or object[]
+  const documentGaps = (data.documentGaps || []).map(gap => {
+    if (typeof gap === 'string') {
+      return {
+        document: gap,
+        howToGet: getDocHelp(gap),
+        timeRequired: getDocTimeline(gap),
+        unlocksSchemes: schemes.filter(s => s.documentsRequired?.includes(gap)).map(s => s.name),
+      };
+    }
+    return gap;
+  });
+
+  return {
+    archetype: data.archetype || {
+      id: 'ai-analyzed',
+      label: data.profileSummary || 'AI-Analyzed Profile',
+      description: `Found ${schemes.length} matching schemes based on your profile.`,
+    },
+    totalProjectedValue: data.totalProjectedValue || schemes.reduce((sum, s) => sum + s.projectedValue, 0),
+    projectionYears: data.projectionYears || 5,
+    schemes,
+    documentGaps,
+    cascadeChains: data.cascadeChains || [],
+    sunsetAlerts: data.sunsetAlerts || [],
+  };
+}
+
+function getDocHelp(doc) {
+  const m = {
+    'Aadhaar Card': 'Visit nearest Aadhaar Enrolment Centre with any photo ID.',
+    'Income Certificate': 'Apply at Tehsildar/Taluk office or through CSC.',
+    'Caste Certificate': 'Apply at SDM/Tehsildar office with supporting documents.',
+    'Ration Card': 'Apply at local food supply office or online on your state portal.',
+    'Bank Account': 'Open a Jan Dhan account at any bank for free.',
+    'Land Documents': 'Get from Tehsildar/Patwari office or online land records portal.',
+    'PAN Card': 'Apply online at incometax.gov.in or visit nearest TIN-FC.',
+    'Voter ID': 'Apply at nvsp.in or through Voter Helpline app.',
+    'MGNREGA Job Card': 'Apply at your Gram Panchayat office.',
+  };
+  return m[doc] || 'Contact your nearest Common Service Centre (CSC) for assistance.';
+}
+
+function getDocTimeline(doc) {
+  const m = {
+    'Aadhaar Card': '15-30 days', 'Income Certificate': '7-15 days',
+    'Caste Certificate': '15-30 days', 'Ration Card': '30-45 days',
+    'Bank Account': '1 day', 'Land Documents': '7-15 days',
+    'PAN Card': '15-21 days', 'Voter ID': '15-30 days',
+    'MGNREGA Job Card': '7-15 days',
+  };
+  return m[doc] || '15-30 days';
+}
+
 function ValueDisplay({ amount }) {
   const formatted = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amount);
   return <span>{formatted}</span>;
@@ -37,7 +129,7 @@ function SchemeCard({ scheme, language }) {
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1 flex-wrap">
               <span className="badge" style={{ background: c.bg, color: c.color }}>{T(`timeline${scheme.type}`)}</span>
-              <span className="badge" style={{ background: 'var(--neutral-100)', color: 'var(--neutral-600)' }}>{scheme.level}</span>
+              {scheme.category && <span className="badge" style={{ background: 'var(--neutral-100)', color: 'var(--neutral-600)' }}>{scheme.category}</span>}
             </div>
             <h3 className="font-bold text-base mb-1" style={{ color: 'var(--neutral-900)' }}>{scheme.name}</h3>
             <p className="text-xs" style={{ color: 'var(--neutral-500)' }}>{scheme.ministry}</p>
@@ -66,6 +158,12 @@ function SchemeCard({ scheme, language }) {
           <div className="mt-3">
             <p className="text-sm mb-3" style={{ color: 'var(--neutral-700)' }}>{scheme.plainDescription}</p>
             
+            {scheme.documentsRequired?.length > 0 && (
+              <div className="p-3 rounded-lg mb-3" style={{ background: 'var(--primary-50)' }}>
+                <span className="text-xs font-semibold" style={{ color: 'var(--primary-700)' }}>📋 Documents needed: {scheme.documentsRequired.join(', ')}</span>
+              </div>
+            )}
+
             {scheme.missingDocuments?.length > 0 && (
               <div className="p-3 rounded-lg mb-3" style={{ background: 'var(--warning-50)' }}>
                 <span className="text-xs font-semibold" style={{ color: 'var(--warning-600)' }}>⚠️ Missing documents: {scheme.missingDocuments.join(', ')}</span>
@@ -79,7 +177,7 @@ function SchemeCard({ scheme, language }) {
                   <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" style={{ background: 'var(--primary-100)', color: 'var(--primary-700)' }}>{step.step}</div>
                   <div className="flex-1">
                     <p className="text-sm" style={{ color: 'var(--neutral-700)' }}>{step.action}</p>
-                    {step.timeRequired !== '—' && <span className="text-xs" style={{ color: 'var(--neutral-400)' }}>⏱ {step.timeRequired}</span>}
+                    {step.timeRequired && step.timeRequired !== '—' && <span className="text-xs" style={{ color: 'var(--neutral-400)' }}>⏱ {step.timeRequired}</span>}
                   </div>
                 </div>
               ))}
@@ -113,7 +211,11 @@ export default function DashboardPage() {
       // Try API first, fall back to mock
       fetch('/api/analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ profile, language }) })
         .then(res => res.ok ? res.json() : Promise.reject())
-        .then(data => { setResults(data); setIsAnalyzing(false); })
+        .then(data => {
+          const normalized = normalizeResults(data);
+          setResults(normalized);
+          setIsAnalyzing(false);
+        })
         .catch(() => {
           // Fallback to mock data
           setTimeout(() => { setResults(generateMockResults(profile)); setIsAnalyzing(false); }, 2000);
@@ -123,9 +225,10 @@ export default function DashboardPage() {
 
   if (isAnalyzing || !results) {
     return (
-      <div className="min-h-screen" style={{ background: 'var(--neutral-50)' }}>
-        <Header />
-        <div style={{ paddingTop: 'calc(var(--header-height) + 40px)' }}>
+      <div className="min-h-screen" style={{ background: 'transparent', position: 'relative', paddingBottom: 80 }}>
+        <div className="relative z-10">
+          <Header />
+          <div style={{ paddingTop: 'calc(var(--header-height) + 40px)' }}>
           <div className="text-center mb-8 px-4">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 animate-pulse-soft" style={{ background: 'var(--primary-100)' }}>
               <Sparkles size={28} style={{ color: 'var(--primary-500)' }} />
@@ -134,6 +237,7 @@ export default function DashboardPage() {
             <p className="text-sm" style={{ color: 'var(--neutral-500)' }}>Checking thousands of schemes across Central and State governments</p>
           </div>
           <SkeletonLoader />
+          </div>
         </div>
       </div>
     );
@@ -145,9 +249,10 @@ export default function DashboardPage() {
   const futureSchemes = r.schemes?.filter(s => s.type === 'Future') || [];
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--neutral-50)', paddingBottom: 80 }}>
-      <Header />
-      <div style={{ paddingTop: 80, maxWidth: 700, marginLeft: 'auto', marginRight: 'auto', paddingLeft: 16, paddingRight: 16 }}>
+    <div className="min-h-screen" style={{ background: 'transparent', position: 'relative', paddingBottom: 80 }}>
+      <div className="relative z-10">
+        <Header />
+        <div style={{ paddingTop: 80, maxWidth: 700, marginLeft: 'auto', marginRight: 'auto', paddingLeft: 16, paddingRight: 16 }}>
         {/* Profile Summary Bar */}
         <div className="card p-4 flex items-center gap-4 animate-fade-in">
           <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0" style={{ background: 'linear-gradient(135deg, var(--primary-500), var(--accent-500))' }}>
@@ -159,7 +264,7 @@ export default function DashboardPage() {
               <Briefcase size={12} /> <span>{profile.occupation}</span>
               {profile.state && <><MapPin size={12} /> <span>{profile.district}, {profile.state}</span></>}
             </div>
-            {r.archetype && <span className="text-xs font-medium" style={{ color: 'var(--primary-600)' }}>{r.archetype.label}</span>}
+            {r.archetype && <span className="text-xs font-medium" style={{ color: 'var(--primary-600)' }}>{typeof r.archetype === 'string' ? r.archetype : r.archetype.label}</span>}
           </div>
           <Link href="/onboarding" className="btn btn-ghost btn-sm"><Edit size={14} /> {T('editProfile')}</Link>
         </div>
@@ -175,6 +280,13 @@ export default function DashboardPage() {
             {r.schemes?.length || 0} {T('schemesFound')}
           </p>
         </div>
+
+        {/* Profile Summary (from Gemini) */}
+        {r.archetype?.description && (
+          <div className="card p-4 mt-4 animate-fade-in" style={{ borderLeft: '4px solid var(--primary-500)' }}>
+            <p className="text-sm" style={{ color: 'var(--neutral-700)', lineHeight: 1.6 }}>{r.archetype.description}</p>
+          </div>
+        )}
 
         {/* Scheme Timeline */}
         {nowSchemes.length > 0 && (
@@ -277,7 +389,7 @@ export default function DashboardPage() {
                   <p className="text-xs mt-1" style={{ color: 'var(--neutral-600)' }}>📋 {gap.howToGet}</p>
                   <div className="flex items-center gap-4 mt-2 text-xs" style={{ color: 'var(--neutral-500)' }}>
                     <span>⏱ {gap.timeRequired}</span>
-                    {gap.unlocksSchemes && <span>🔓 Unlocks: {gap.unlocksSchemes.join(', ')}</span>}
+                    {gap.unlocksSchemes?.length > 0 && <span>🔓 Unlocks: {gap.unlocksSchemes.join(', ')}</span>}
                   </div>
                 </div>
               ))}
@@ -293,6 +405,7 @@ export default function DashboardPage() {
             <ArrowRight size={18} />
           </Link>
         </div>
+      </div>
       </div>
       <BottomNav />
     </div>
