@@ -56,6 +56,9 @@
   /* Layout */
   --max-width: 1200px;
   --header-height: 64px;
+  --announcement-height: 48px;
+  --category-card-min-height: 160px;
+  --category-title-min-height: 40px;
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;

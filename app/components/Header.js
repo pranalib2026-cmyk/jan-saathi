@@ -6,7 +6,7 @@ import useStore from '../lib/store';
 import { t, languages } from '../lib/translations';
 import { Menu, X, Globe, Home, LayoutDashboard, MessageCircle, FileText, Settings, ChevronDown } from 'lucide-react';
 
-export default function Header() {
+export default function Header({ showAnnouncement = false }) {
   const { language, setLanguage, sidebarOpen, toggleSidebar } = useStore();
   const [langOpen, setLangOpen] = useState(false);
   const pathname = usePathname();
@@ -20,8 +20,18 @@ export default function Header() {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 glass" style={{ borderBottom: '1px solid var(--neutral-200)' }}>
-        <div className="flex items-center justify-between px-4 lg:px-8" style={{ height: 'var(--header-height)', maxWidth: 'var(--max-width)', margin: '0 auto' }}>
+      <header className="fixed top-0 left-0 right-0 z-[70]">
+        {showAnnouncement && (
+          <div className="w-full py-3 px-4" style={{ background: 'white', borderBottom: '1px solid var(--neutral-200)' }}>
+            <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-2 text-center text-xs sm:text-sm" style={{ color: 'var(--neutral-600)' }}>
+              <span>{t(language, 'step1Desc')}</span>
+              <span>{t(language, 'step2Desc')}</span>
+              <span>{t(language, 'step3Desc')}</span>
+            </div>
+          </div>
+        )}
+        <div className="glass" style={{ borderBottom: '1px solid var(--neutral-200)' }}>
+          <div className="max-w-6xl mx-auto flex items-center justify-between px-6 py-4" style={{ minHeight: 'var(--header-height)' }}>
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 no-underline">
             <div className="flex items-center justify-center rounded-xl" style={{ width: 36, height: 36, background: 'linear-gradient(135deg, var(--primary-500), var(--accent-500))' }}>
@@ -81,6 +91,7 @@ export default function Header() {
               {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
+          </div>
         </div>
       </header>
 
@@ -88,7 +99,7 @@ export default function Header() {
       {sidebarOpen && (
         <div className="fixed inset-0 z-40 md:hidden">
           <div className="absolute inset-0 bg-black/30" onClick={toggleSidebar} />
-          <div className="absolute right-0 top-0 bottom-0 w-72 bg-white shadow-xl animate-slide-left" style={{ paddingTop: 'var(--header-height)' }}>
+          <div className="absolute right-0 top-0 bottom-0 w-72 bg-white shadow-xl animate-slide-left" style={{ paddingTop: showAnnouncement ? 'calc(var(--header-height) + var(--announcement-height))' : 'var(--header-height)' }}>
             <nav className="p-4 flex flex-col gap-1">
               {navItems.map(item => (
                 <Link key={item.href} href={item.href} onClick={toggleSidebar}
